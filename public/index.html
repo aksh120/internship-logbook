@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Social Media Internship Logbook 2026 — Track daily tasks, activities, and progress." />
+  <title>Social Media Internship Logbook</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- ───── STICKY HEADER ───── -->
+  <header id="app-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="header-titles">
+          <span class="user-name" id="user-name">Akshat Apoorv</span>
+          <h1 class="app-title">Social Media Internship Logbook <span class="year-badge">2026</span></h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-add-day" class="btn btn-secondary" title="Add new day entry">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Add Day
+        </button>
+        <button id="btn-export" class="btn btn-primary" title="Export all logs to Excel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Export Excel
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ───── MAIN CONTENT ───── -->
+  <main id="log-container">
+    <div class="loading-state" id="loading-state">
+      <div class="spinner"></div>
+      <p>Loading logbook…</p>
+    </div>
+  </main>
+
+  <!-- ───── TASK MODAL ───── -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal" id="task-modal">
+      <div class="modal-header">
+        <h2 id="modal-title">Add Task</h2>
+        <button class="modal-close" id="modal-close" title="Close">&times;</button>
+      </div>
+      <form id="task-form" autocomplete="off">
+        <input type="hidden" id="form-date" />
+        <input type="hidden" id="form-task-id" />
+
+        <div class="form-group">
+          <label for="form-title">Title</label>
+          <input type="text" id="form-title" placeholder="e.g. Post Design" required />
+        </div>
+
+        <div class="form-group">
+          <label for="form-subtitle">Subtitle (Work Done)</label>
+          <input type="text" id="form-subtitle" placeholder="e.g. Created Instagram post" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="form-time">Time</label>
+            <input type="time" id="form-time" />
+          </div>
+          <div class="form-group">
+            <label for="form-remark">Remark</label>
+            <input type="text" id="form-remark" placeholder="e.g. Approved" />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="btn-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit">Add Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ───── ADD DAY MODAL ───── -->
+  <div class="modal-backdrop" id="day-modal-backdrop">
+    <div class="modal modal-sm" id="day-modal">
+      <div class="modal-header">
+        <h2>Add Day Entry</h2>
+        <button class="modal-close" id="day-modal-close" title="Close">&times;</button>
+      </div>
+      <form id="day-form" autocomplete="off">
+        <div class="form-group">
+          <label for="day-date-input">Date</label>
+          <input type="date" id="day-date-input" required />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="day-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Day</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ───── TOAST ───── -->
+  <div id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
