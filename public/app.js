@@ -15,7 +15,6 @@ const modalBackdrop = document.getElementById('modal-backdrop');
 const taskForm = document.getElementById('task-form');
 const formDate = document.getElementById('form-date');
 const formTaskId = document.getElementById('form-task-id');
-const formTitle = document.getElementById('form-title');
 const formSubtitle = document.getElementById('form-subtitle');
 const formTime = document.getElementById('form-time');
 const formRemark = document.getElementById('form-remark');
@@ -187,18 +186,30 @@ async function deleteTask(date, taskId) {
 }
 
 async function toggleAbsent(date) {
+  // Optimistic update — instant UI feedback
+  const oldStatus = logsData[date]?.status;
+  const newStatus = oldStatus === 'absent' ? 'present' : 'absent';
+  if (logsData[date]) {
+    logsData[date].status = newStatus;
+    renderLogs();
+  }
+  showToast(`Marked as ${newStatus}`);
+
   try {
     const res = await fetch(`${API}/api/logs/${date}/absent`, {
       method: 'PATCH'
     });
     const json = await res.json();
-    if (json.success) {
-      showToast(`Marked as ${json.status}`);
-      await fetchLogs();
-    } else {
+    if (!json.success) {
+      // Revert on failure
+      if (logsData[date]) logsData[date].status = oldStatus;
+      renderLogs();
       showToast('Failed to update status', 'error');
     }
   } catch (err) {
+    // Revert on error
+    if (logsData[date]) logsData[date].status = oldStatus;
+    renderLogs();
     showToast('Error updating status', 'error');
   }
 }
@@ -261,7 +272,6 @@ function renderLogs() {
               <span class="task-time">${formatTime12(task.time)}</span>
             </div>
             <div class="task-content">
-              <div class="task-title">${escapeHtml(task.title)}</div>
               <div class="task-subtitle">${escapeHtml(task.subtitle)}</div>
               ${task.remark ? `<div class="task-remark">Remark: <span>${escapeHtml(task.remark)}</span></div>` : ''}
             </div>
@@ -301,7 +311,7 @@ function escapeHtml(str) {
 // ── Modal Logic ──
 function openModal() {
   modalBackdrop.classList.add('active');
-  setTimeout(() => formTitle.focus(), 200);
+  setTimeout(() => formSubtitle.focus(), 200);
 }
 
 function closeModal() {
@@ -330,7 +340,6 @@ function openEditModal(date, taskId) {
   btnSubmit.textContent = 'Save Changes';
   formDate.value = date;
   formTaskId.value = taskId;
-  formTitle.value = task.title;
   formSubtitle.value = task.subtitle;
   formTime.value = task.time;
   formRemark.value = task.remark || '';
@@ -350,14 +359,13 @@ taskForm.addEventListener('submit', async e => {
   const date = formDate.value;
   const taskId = formTaskId.value;
   const data = {
-    title: formTitle.value.trim(),
     subtitle: formSubtitle.value.trim(),
     time: formTime.value,
     remark: formRemark.value.trim()
   };
 
-  if (!data.title || !data.subtitle) {
-    showToast('Title and subtitle are required', 'error');
+  if (!data.subtitle) {
+    showToast('Work Done is required', 'error');
     return;
   }
 
@@ -407,22 +415,17 @@ dayForm.addEventListener('submit', async e => {
 
   closeDayModal();
 
-  // Create the entry by adding and then immediately use the endpoint
   try {
-    const res = await fetch(`${API}/api/logs/${date}/tasks`, {
+    const res = await fetch(`${API}/api/logs/${date}/day`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: '__init__',
-        subtitle: '__init__'
-      })
+      headers: { 'Content-Type': 'application/json' }
     });
     const json = await res.json();
     if (json.success) {
-      // Delete the placeholder task
-      await fetch(`${API}/api/logs/${date}/tasks/${json.task.id}`, { method: 'DELETE' });
       showToast('Day entry created');
       await fetchLogs();
+    } else {
+      showToast(json.error || 'Failed to create day', 'error');
     }
   } catch (err) {
     showToast('Error creating day entry', 'error');
