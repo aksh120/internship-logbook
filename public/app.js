@@ -262,7 +262,7 @@ function renderLogs() {
     // Body
     html += `<div class="day-body">`;
     if (entry.tasks.length === 0) {
-      html += `<div class="no-tasks">No tasks given and/or done</div>`;
+      html += `<div class="no-tasks">No tasks given or done</div>`;
     } else {
       html += `<div class="task-list">`;
       entry.tasks.forEach(task => {

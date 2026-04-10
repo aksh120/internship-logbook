@@ -377,7 +377,7 @@ app.get('/api/export', async (req, res) => {
         rows.push([
           { v: formatDatePretty(day.date), s: baseStyle },
           { v: '', s: baseStyle },
-          { v: 'No tasks given and/or done', s: { ...wdStyle, font: { ...wdStyle.font, italic: true, color: { rgb: '999999' } } } },
+          { v: 'No tasks given or done', s: { ...wdStyle, font: { ...wdStyle.font, italic: true, color: { rgb: '999999' } } } },
           { v: status, s: statusCellStyle },
           { v: '', s: baseStyle }
         ]);
