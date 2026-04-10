@@ -406,7 +406,7 @@ app.get('/api/export', async (req, res) => {
 
     // Column widths
     ws['!cols'] = [
-      { wch: 18 }, { wch: 14 }, { wch: 44 }, { wch: 12 }, { wch: 32 }
+      { wch: 18 }, { wch: 14 }, { wch: 60 }, { wch: 12 }, { wch: 22 }
     ];
 
     // Row heights
