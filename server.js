@@ -74,6 +74,7 @@ app.get('/api/logs', async (req, res) => {
     if (daysResult.error) throw daysResult.error;
     if (tasksResult.error) throw tasksResult.error;
 
+    const today = getTodayString();
     const days = daysResult.data;
     const tasks = tasksResult.data;
 
@@ -84,8 +85,23 @@ app.get('/api/logs', async (req, res) => {
       tasksByDate[t.day_date].push({ id: t.id, subtitle: t.subtitle, time: t.time, remark: t.remark });
     }
 
-    const result = {};
+    const emptyDaysToDelete = [];
+    const activeDays = [];
     for (const day of days) {
+      const hasTasks = tasksByDate[day.date] && tasksByDate[day.date].length > 0;
+      if (day.date !== today && !hasTasks) {
+        emptyDaysToDelete.push(day.date);
+      } else {
+        activeDays.push(day);
+      }
+    }
+
+    if (emptyDaysToDelete.length > 0) {
+      await supabase.from('day_entries').delete().in('date', emptyDaysToDelete);
+    }
+
+    const result = {};
+    for (const day of activeDays) {
       result[day.date] = {
         status: day.status,
         tasks: tasksByDate[day.date] || []
@@ -364,8 +380,14 @@ app.get('/api/export', async (req, res) => {
     ]);
 
     // Row 5+: Data
+    const today = getTodayString();
+    const filteredDays = (days || []).filter(day => {
+      const dayTasks = (tasks || []).filter(t => t.day_date === day.date);
+      return day.date === today || dayTasks.length > 0;
+    });
+
     let dataRowIndex = 0;
-    for (const day of (days || [])) {
+    for (const day of filteredDays) {
       const dayTasks = (tasks || []).filter(t => t.day_date === day.date);
       const status = day.status === 'absent' ? 'Absent' : 'Present';
       const isOdd = dataRowIndex % 2 === 1;

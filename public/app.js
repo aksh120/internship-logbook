@@ -408,28 +408,13 @@ dayForm.addEventListener('submit', async e => {
   const date = dayDateInput.value;
   if (!date) return;
 
-  if (logsData[date]) {
+  if (logsData[date] && logsData[date].tasks && logsData[date].tasks.length > 0) {
     showToast('Entry for this date already exists', 'error');
     return;
   }
 
   closeDayModal();
-
-  try {
-    const res = await fetch(`${API}/api/logs/${date}/day`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    const json = await res.json();
-    if (json.success) {
-      showToast('Day entry created');
-      await fetchLogs();
-    } else {
-      showToast(json.error || 'Failed to create day', 'error');
-    }
-  } catch (err) {
-    showToast('Error creating day entry', 'error');
-  }
+  openAddModal(date);
 });
 
 // ── Export ──
